@@ -1,4 +1,3 @@
-# libra-manual-test
 # 第一批命令人工验证测试方案
 
 ## 测试环境准备
@@ -501,6 +500,8 @@ libra status
 
 **预期**: status 显示 file1.txt、file2.txt 在 staged/new 中，exit 0
 
+**实际结果：**PASS。但没有exit 0
+
 ### A-02 --json 输出
 
 ```bash
@@ -509,6 +510,8 @@ libra --json add file3.txt | jq '.'
 ```
 
 **预期**: `ok: true`，`data.added` 含 `"file3.txt"`
+
+**实际结果：**PASS
 
 ### A-03 --all 全部暂存
 
@@ -521,6 +524,8 @@ libra --json add --all | jq '.'
 
 **预期**: `data` 含 `modified`（file1.txt）、`removed`（file2.txt）、`added`（file4.txt）
 
+**实际结果：**PASS
+
 ### A-04 --dry-run 预览
 
 ```bash
@@ -531,6 +536,8 @@ libra status | grep dry.txt
 
 **预期**: `dry_run: true`，status 中 dry.txt 仍为 untracked
 
+**实际结果：**PASS
+
 ### A-05 --verbose 详细输出
 
 ```bash
@@ -540,6 +547,8 @@ libra add --verbose verbose.txt
 
 **预期**: 输出含 `add(new): verbose.txt` 前缀
 
+**实际结果：**PASS
+
 ### A-06 pathspec 不匹配
 
 ```bash
@@ -548,6 +557,8 @@ libra add nonexistent.txt; echo "exit=$?"
 
 **预期**: exit 129，stderr 含 `LBR-CLI-003`
 
+**实际结果：**PASS。但stderr中不含`LBR-CLI-003`
+
 ### A-07 无参数无标志
 
 ```bash
@@ -555,6 +566,8 @@ libra add; echo "exit=$?"
 ```
 
 **预期**: exit 129，错误提示需要路径或标志
+
+**实际结果：**PASS
 
 ### A-08 --update 仅更新已跟踪
 
@@ -565,6 +578,8 @@ libra --json add --update | jq '.data'
 ```
 
 **预期**: `modified` 含 file1.txt，`added` 不含 untracked.txt
+
+**实际结果：**PASS
 
 ### A-09 --force 添加忽略文件
 
@@ -578,6 +593,8 @@ libra add --force test.log; echo "exit=$?"
 
 **预期**: 第一次 add 失败（被 ignore），--force 成功
 
+**实际结果：**FAIL。第一次就成功。
+
 ### A-10 --quiet 静默
 
 ```bash
@@ -586,6 +603,8 @@ libra add --quiet quiet.txt
 ```
 
 **预期**: stdout 无输出，exit 0
+
+**实际结果：**PASS。但是也没有exit 0
 
 ### A-11 --machine 输出
 
@@ -596,6 +615,8 @@ libra --machine add machine.txt | jq '.'
 
 **预期**: 单行 NDJSON
 
+**实际结果：**PASS
+
 ### A-12 --exit-code-on-warning
 
 ```bash
@@ -605,6 +626,8 @@ libra --exit-code-on-warning add warn.log; echo "exit=$?"
 
 **预期**: .log 被 ignore，触发 warning，exit 9
 
+**实际结果：**FAIL。被成功add
+
 ### A-13 --refresh 刷新索引
 
 ```bash
@@ -612,6 +635,8 @@ libra --json add --refresh | jq '.data.refreshed'
 ```
 
 **预期**: 返回刷新的文件列表，exit 0
+
+**实际结果：**FAIL。输出了[]
 
 ---
 
@@ -628,6 +653,8 @@ libra status
 
 **预期**: 显示 "nothing to commit, working tree clean"，exit 0
 
+**实际结果：**PASS。但是没有exit 0
+
 ### S-02 --json 干净
 
 ```bash
@@ -635,6 +662,8 @@ libra --json status | jq '.data.is_clean'
 ```
 
 **预期**: `true`
+
+**实际结果：**PASS
 
 ### S-03 有修改的 --json
 
@@ -646,6 +675,8 @@ libra --json status | jq '.'
 
 **预期**: `is_clean: false`，`unstaged.modified` 含 file.txt，`untracked` 含 new.txt
 
+**实际结果：**PASS
+
 ### S-04 有暂存的 --json
 
 ```bash
@@ -655,6 +686,8 @@ libra --json status | jq '.data.staged'
 
 **预期**: `staged.modified` 含 file.txt
 
+**实际结果：**PASS
+
 ### S-05 --short 短格式
 
 ```bash
@@ -662,6 +695,8 @@ libra status --short
 ```
 
 **预期**: 类似 Git 短格式（`M file.txt`、`?? new.txt`）
+
+**实际结果：**PASS
 
 ### S-06 --porcelain v2
 
@@ -671,6 +706,8 @@ libra status --porcelain v2
 
 **预期**: porcelain v2 格式，含 `# branch.oid`、`# branch.head`
 
+**实际结果：**FAIL。输出为 porcelain v2 记录格式，但未包含预期中的 # branch.oid 和 # branch.head 头信息。
+
 ### S-07 --exit-code（dirty）
 
 ```bash
@@ -678,6 +715,8 @@ libra status --exit-code; echo "exit=$?"
 ```
 
 **预期**: exit 1（有未提交更改）
+
+**实际结果：**PASS
 
 ### S-08 --exit-code（clean）
 
@@ -688,6 +727,8 @@ libra status --exit-code; echo "exit=$?"
 
 **预期**: exit 0
 
+**实际结果：**PASS
+
 ### S-09 --branch 分支信息
 
 ```bash
@@ -695,6 +736,8 @@ libra status --branch
 ```
 
 **预期**: 显示当前分支名和 tracking 信息
+
+**实际结果：**PASS
 
 ### S-10 detached HEAD
 
@@ -706,6 +749,8 @@ libra --json status | jq '.data.head'
 
 **预期**: `head.type` 为 `"detached"`，含 `oid`
 
+**实际结果：**PASS
+
 ### S-11 --machine 输出
 
 ```bash
@@ -714,6 +759,8 @@ libra --machine status | jq '.'
 
 **预期**: 单行 NDJSON，字段完整
 
+**实际结果：**PASS
+
 ### S-12 --quiet 静默
 
 ```bash
@@ -721,6 +768,8 @@ libra status --quiet
 ```
 
 **预期**: stdout 无输出，exit 0
+
+**实际结果：**PASS。但没有exit 0
 
 ### S-13 --untracked-files no
 
@@ -731,6 +780,8 @@ libra --json status --untracked-files no | jq '.data.untracked'
 
 **预期**: `untracked` 为空数组
 
+**实际结果：**PASS
+
 ### S-14 非仓库目录
 
 ```bash
@@ -739,6 +790,8 @@ libra status; echo "exit=$?"
 ```
 
 **预期**: exit 128，stderr 含 `LBR-REPO-001`
+
+**实际结果：**PASS。但是stderr中未包含`LBR-REPO-001`
 
 ---
 
@@ -756,6 +809,8 @@ libra commit -m "initial commit"
 
 **预期**: 输出 `[main <short_id>] initial commit`，exit 0
 
+**实际输出：**PASS。但是并没有输出exit 0
+
 ### CM-02 --json 输出
 
 ```bash
@@ -764,6 +819,8 @@ libra --json commit -m "add file2" | jq '.'
 ```
 
 **预期**: `ok: true`，`data` 含 `head`、`branch`、`commit`、`short_id`、`subject`、`root_commit`（false）、`files_changed`
+
+**实际结果：**PASS
 
 ### CM-03 root-commit 标识
 
@@ -776,6 +833,7 @@ libra --json commit -m "first" | jq '.data.root_commit'
 ```
 
 **预期**: `true`
+**实际结果：**PASS
 
 ### CM-04 nothing to commit
 
@@ -786,6 +844,8 @@ libra commit -m "empty"; echo "exit=$?"
 
 **预期**: exit 128，stderr 含 `LBR-REPO-003`
 
+**实际结果：**PASS。但是stderr中未含`LBR-REPO-003`
+
 ### CM-05 nothing to commit --json
 
 ```bash
@@ -793,6 +853,8 @@ libra --json commit -m "empty" 2>&1 | grep error_code
 ```
 
 **预期**: stderr 含 `"error_code": "LBR-REPO-003"`
+
+**实际结果：**PASS
 
 ### CM-06 --amend
 
@@ -803,6 +865,8 @@ libra --json commit --amend -m "amended message" | jq '.data.amend'
 
 **预期**: `true`
 
+**实际结果：**PASS
+
 ### CM-07 --amend --no-edit
 
 ```bash
@@ -811,6 +875,8 @@ libra --json commit --amend --no-edit | jq '.data.subject'
 ```
 
 **预期**: subject 保持 "amended message"（复用上次提交信息）
+
+**实际结果：**FAIL。实际输出"gpgsig -----BEGIN PGP SIGNATURE-----"
 
 ### CM-08 -a 自动暂存
 
@@ -821,6 +887,15 @@ libra --json commit -a -m "auto stage" | jq '.data.files_changed'
 
 **预期**: `total >= 1`，`modified >= 1`
 
+**实际结果：**FAIL。实际输出：
+
+{
+  "deleted": 0,
+  "modified": 1,
+  "new": 0,
+  "total": 1
+}
+
 ### CM-09 --signoff
 
 ```bash
@@ -829,6 +904,8 @@ libra --json commit --signoff -m "signed commit" | jq '.data.signoff'
 ```
 
 **预期**: `true`
+
+**实际结果：**PASS
 
 ### CM-10 --conventional 合规
 
@@ -839,6 +916,8 @@ libra commit --conventional -m "feat(core): add feature"; echo "exit=$?"
 
 **预期**: exit 0
 
+**实际结果：**PASS
+
 ### CM-11 --conventional 不合规
 
 ```bash
@@ -847,6 +926,8 @@ libra commit --conventional -m "bad message"; echo "exit=$?"
 ```
 
 **预期**: exit 129，stderr 含 `LBR-CLI-002`
+
+**实际结果：**PASS。但是stderr未含`LBR-CLI-002`
 
 ### CM-12 --author 覆盖
 
@@ -857,6 +938,30 @@ libra --json commit --author "Custom Author <custom@test.dev>" -m "custom author
 
 **预期**: exit 0，提交成功
 
+**实际结果：**PASS。但实际输出为：
+{
+  "command": "commit",
+  "data": {
+    "amend": false,
+    "branch": "main",
+    "commit": "308ab02d5068ed4fe57e3f83cefff5dbbc8a54fa",
+    "conventional": null,
+    "files_changed": {
+      "deleted": 0,
+      "modified": 0,
+      "new": 2,
+      "total": 2
+    },
+    "head": "main",
+    "root_commit": false,
+    "short_id": "308ab02",
+    "signed": true,
+    "signoff": false,
+    "subject": "custom author"
+  },
+  "ok": true
+}
+
 ### CM-13 --author 无效格式
 
 ```bash
@@ -865,6 +970,8 @@ libra commit --author "no-angle-brackets" -m "bad"; echo "exit=$?"
 ```
 
 **预期**: exit 129，stderr 含 `LBR-CLI-002`
+
+**实际结果：**PASS。但stderr未含`LBR-CLI-002`
 
 ### CM-14 -F 文件读取消息
 
@@ -876,6 +983,8 @@ libra --json commit -F /tmp/msg.txt | jq '.data.subject'
 
 **预期**: `"message from file"`
 
+**实际结果：**PASS
+
 ### CM-15 --allow-empty
 
 ```bash
@@ -883,6 +992,8 @@ libra --json commit --allow-empty -m "empty commit" | jq '.data.files_changed.to
 ```
 
 **预期**: `0`，exit 0
+
+**实际结果：**PASS。但未输出exit 0
 
 ### CM-16 --quiet 静默
 
@@ -893,6 +1004,8 @@ libra commit --quiet -m "quiet commit"
 
 **预期**: stdout 无输出，exit 0
 
+**实际结果：**PASS。但未输出exit 0
+
 ### CM-17 --machine 输出
 
 ```bash
@@ -902,6 +1015,8 @@ libra --machine commit -m "machine" | jq '.'
 
 **预期**: 单行 NDJSON
 
+**实际结果：**PASS
+
 ### CM-18 signed 字段（vault 签名）
 
 ```bash
@@ -910,6 +1025,8 @@ libra --json commit -m "signed" | jq '.data.signed'
 ```
 
 **预期**: `true`（init 默认 vault signing = true）或 `false`（取决于 vault 状态）
+
+**实际结果：**PASS。
 
 ---
 
@@ -928,6 +1045,8 @@ echo "exit=$?"
 
 **预期**: exit 0，成功推送到 GitHub
 
+**实际结果：**PASS
+
 ### P-02 --json 输出
 
 ```bash
@@ -936,6 +1055,8 @@ libra --json push origin main | jq '.'
 ```
 
 **预期**: `ok: true`，`data` 含 `remote`、`url`、`branch`、`pushed`（含 `updated_refs`）、`objects_sent`、`force`（false）
+
+**实际结果：**FAIL。json中部分数据不一致
 
 ### P-03 --dry-run 预览
 
@@ -946,6 +1067,8 @@ libra --json push --dry-run origin main | jq '.data'
 
 **预期**: exit 0，但不实际推送（后续 pull 看不到该 commit）
 
+**实际结果：**PASS
+
 ### P-04 --set-upstream
 
 ```bash
@@ -955,6 +1078,8 @@ libra --json push --set-upstream origin feature-upstream | jq '.data.set_upstrea
 ```
 
 **预期**: `true`，后续 push/pull 不需要指定 remote/branch
+
+**实际结果：**FAIL。输出null
 
 ### P-05 non-fast-forward 拒绝
 
@@ -977,6 +1102,8 @@ libra push origin main; echo "exit=$?"
 
 **预期**: exit 128，stderr 含 `LBR-CONFLICT-002`（non-fast-forward）
 
+**实际结果：**PASS
+
 ### P-06 --force 强制推送
 
 ```bash
@@ -985,6 +1112,8 @@ libra push --force origin main; echo "exit=$?"
 ```
 
 **预期**: exit 0，强制覆盖远程
+
+**实际结果：**PASS
 
 ### P-07 远程不存在（fuzzy match）
 
@@ -996,6 +1125,8 @@ echo "exit=$?"
 
 **预期**: exit 129，stderr 含 `LBR-CLI-003`，可能含 "did you mean 'origin'?"
 
+**实际结果：**PASS
+
 ### P-08 无效 refspec
 
 ```bash
@@ -1003,6 +1134,8 @@ libra push origin "a:b:c"; echo "exit=$?"
 ```
 
 **预期**: exit 129，stderr 含 `LBR-CLI-002`
+
+**实际结果：**PASS
 
 ### P-09 --quiet 静默
 
@@ -1013,6 +1146,8 @@ libra push --quiet origin main
 
 **预期**: stdout 无进度输出，exit 0
 
+**实际结果：**PASS
+
 ### P-10 JSON 错误输出
 
 ```bash
@@ -1020,6 +1155,8 @@ libra --json push nonexistent-remote main 2>&1 | grep error_code
 ```
 
 **预期**: stderr 含 `"error_code": "LBR-CLI-003"`
+
+**实际结果：**PASS
 
 ### P-11 detached HEAD 推送
 
@@ -1029,6 +1166,8 @@ libra push origin main; echo "exit=$?"
 ```
 
 **预期**: exit 128，stderr 含 `LBR-REPO-003`（detached HEAD）
+
+**实际结果：**PASS
 
 ---
 
