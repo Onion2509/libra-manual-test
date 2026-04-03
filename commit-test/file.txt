@@ -1,0 +1,5 @@
+hello
+amend
+amend2
+auto
+auto
